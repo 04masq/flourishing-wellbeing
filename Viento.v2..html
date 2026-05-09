@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flourish — Workplace Wellbeing</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;1,400&display=swap');
+
+  :root {
+    --bg: #f7f4ef;
+    --surface: #ffffff;
+    --ink: #1c1917;
+    --muted: #78716c;
+    --border: #e7e2da;
+    --morning: #e8824a;
+    --morning-light: #fdf0e8;
+    --morning-dark: #c4632e;
+    --night: #3d5a80;
+    --night-light: #e8eef5;
+    --good: #4a7c59;
+    --good-light: #eaf2ec;
+    --warn: #d97706;
+    --radius: 20px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.07);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+  }
+
+  /* App shell */
+  .app {
+    width: 100%;
+    max-width: 420px;
+    min-height: 100vh;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* Nav */
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px 12px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+
+  .nav-logo span { color: var(--morning); font-style: italic; }
+
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--border);
+    border-radius: 30px;
+    padding: 3px;
+  }
+
+  .nav-tab {
+    padding: 5px 14px;
+    border-radius: 24px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+
+  .nav-tab.active {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+
+  /* Screens */
+  .screen { display: none; padding: 8px 24px 100px; }
+  .screen.active { display: block; }
+
+  /* Date header */
+  .date-header {
+    margin-bottom: 20px;
+  }
+
+  .date-greeting {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 2px;
+    font-weight: 400;
+  }
+
+  .date-main {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .date-main em { color: var(--morning); font-style: italic; }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-label .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--morning);
+  }
+
+  .card-label .dot.night { background: var(--night); }
+  .card-label .dot.good { background: var(--good); }
+
+  /* Sliders */
+  .slider-group {
+    margin-bottom: 18px;
+  }
+
+  .slider-group:last-child { margin-bottom: 0; }
+
+  .slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+
+  .slider-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .slider-val {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--morning);
+    font-variant-numeric: tabular-nums;
+    min-width: 28px;
+    text-align: right;
+  }
+
+  .slider-val.low { color: #c0392b; }
+  .slider-val.mid { color: var(--warn); }
+  .slider-val.high { color: var(--good); }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 6px;
+    background: var(--border);
+    outline: none;
+    cursor: pointer;
+    margin-bottom: 6px;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--morning);
+    box-shadow: 0 2px 8px rgba(232,130,74,0.4);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+  .slider-hints {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  /* Emotion labels */
+  .emotion-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .emotion-chip {
+    padding: 7px 14px;
+    border-radius: 30px;
+    border: 1.5px solid var(--border);
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    background: transparent;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .emotion-chip:hover { border-color: var(--morning); color: var(--morning); }
+
+  .emotion-chip.selected {
+    background: var(--morning-light);
+    border-color: var(--morning);
+    color: var(--morning-dark);
+    font-weight: 600;
+  }
+
+  /* Note textarea */
+  .note-area {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13.5px;
+    color: var(--ink);
+    background: var(--bg);
+    resize: none;
+    outline: none;
+    line-height: 1.6;
+    transition: border-color 0.2s;
+    min-height: 80px;
+  }
+
+  .note-area:focus { border-color: var(--morning); }
+  .note-area::placeholder { color: #b8b0a8; }
+
+  /* Submit button */
+  .btn-primary {
+    width: 100%;
+    padding: 15px;
+    border-radius: 14px;
+    border: none;
+    background: var(--morning);
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+    margin-top: 4px;
+  }
+
+  .btn-primary:hover { background: var(--morning-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(232,130,74,0.35); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 13px;
+    border-radius: 14px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+
+  .btn-secondary:hover { border-color: var(--muted); color: var(--ink); }
+
+  /* Success state */
+  .success-card {
+    background: var(--good-light);
+    border: 1.5px solid #c3dfc9;
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  .success-icon { font-size: 32px; margin-bottom: 8px; }
+  .success-title { font-size: 16px; font-weight: 600; color: var(--good); margin-bottom: 4px; }
+  .success-sub { font-size: 13px; color: #5a8a68; }
+
+  /* Three Good Things */
+  .tgt-card {
+    background: var(--night-light);
+    border: 1.5px solid #c5d5e8;
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .tgt-card::before {
+    content: '✦';
+    position: absolute;
+    right: 20px; top: 16px;
+    font-size: 32px;
+    color: var(--night);
+    opacity: 0.12;
+  }
+
+  .tgt-header {
+    margin-bottom: 16px;
+  }
+
+  .tgt-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--night);
+    margin-bottom: 4px;
+  }
+
+  .tgt-sub {
+    font-size: 12px;
+    color: #5a7a9a;
+    line-height: 1.5;
+  }
+
+  .tgt-input-group {
+    margin-bottom: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .tgt-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--night);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+
+  .tgt-input {
+    flex: 1;
+    border: 1.5px solid #c5d5e8;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    background: rgba(255,255,255,0.7);
+    outline: none;
+    color: var(--ink);
+    transition: border-color 0.2s;
+  }
+
+  .tgt-input:focus { border-color: var(--night); }
+  .tgt-input::placeholder { color: #9ab0c4; }
+
+  .btn-night {
+    width: 100%;
+    padding: 13px;
+    border-radius: 14px;
+    border: none;
+    background: var(--night);
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 6px;
+  }
+
+  .btn-night:hover { background: #2d4a6e; transform: translateY(-1px); }
+
+  /* TGT Entry structure */
+  .tgt-entry {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #c5d5e840;
+  }
+
+  .tgt-entry:last-of-type { border-bottom: none; margin-bottom: 8px; }
+
+  .tgt-entry-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .tgt-entry-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--night);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .tgt-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-left: 36px;
+  }
+
+  .tgt-field-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+  }
+
+  .what-label { color: var(--night); }
+  .why-label { color: var(--good); margin-top: 8px; }
+
+  .tgt-why {
+    background: rgba(74,124,89,0.06) !important;
+    border-color: #c3dfc9 !important;
+  }
+
+  .tgt-why:focus { border-color: var(--good) !important; }
+
+  /* Trend screen */
+  .trend-header {
+    margin-bottom: 20px;
+  }
+
+  .trend-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .trend-sub { font-size: 13px; color: var(--muted); }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 14px;
+    text-align: center;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  .stat-val {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--morning);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .stat-label { font-size: 10px; color: var(--muted); font-weight: 500; letter-spacing: 0.05em; }
+
+  /* Chart */
+  .chart-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  .chart-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .chart-legend {
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .legend-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 4px;
+  }
+
+  canvas {
+    width: 100% !important;
+    height: 180px !important;
+  }
+
+  /* Emotions history */
+  .emotion-history {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .history-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--bg);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .history-date { font-size: 12px; color: var(--muted); }
+  .history-emotions { display: flex; gap: 6px; }
+  .history-chip {
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: var(--morning-light);
+    color: var(--morning-dark);
+    font-weight: 500;
+  }
+
+  .history-chip.night {
+    background: var(--night-light);
+    color: var(--night);
+  }
+
+  .tgt-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: var(--good-light);
+    color: var(--good);
+    font-weight: 600;
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 420px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 20px;
+    z-index: 20;
+  }
+
+  .bnav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    padding: 4px 20px;
+    border-radius: 12px;
+    transition: all 0.2s;
+    border: none;
+    background: transparent;
+  }
+
+  .bnav-icon { font-size: 22px; }
+  .bnav-label { font-size: 10px; font-weight: 500; color: var(--muted); }
+  .bnav-item.active .bnav-label { color: var(--morning); }
+
+  /* Notification banner */
+  .notif-banner {
+    background: linear-gradient(135deg, #3d5a80 0%, #2d4a6e 100%);
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .notif-banner:hover { transform: translateY(-2px); }
+
+  .notif-icon { font-size: 28px; flex-shrink: 0; }
+  .notif-text { flex: 1; }
+  .notif-title { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 2px; }
+  .notif-sub { font-size: 12px; color: #a8c4e0; }
+  .notif-arrow { color: #a8c4e0; font-size: 16px; }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .screen.active > * {
+    animation: fadeUp 0.3s ease both;
+  }
+
+  .screen.active > *:nth-child(2) { animation-delay: 0.05s; }
+  .screen.active > *:nth-child(3) { animation-delay: 0.1s; }
+  .screen.active > *:nth-child(4) { animation-delay: 0.15s; }
+  .screen.active > *:nth-child(5) { animation-delay: 0.2s; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Nav -->
+  <div class="nav">
+    <div class="nav-logo">flour<span>ish</span></div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showScreen('checkin', this)">Check-in</button>
+      <button class="nav-tab" onclick="showScreen('trends', this)">Trends</button>
+    </div>
+  </div>
+
+  <!-- CHECK-IN SCREEN -->
+  <div id="screen-checkin" class="screen active">
+
+    <div class="date-header">
+      <div class="date-greeting">Good morning —</div>
+      <div class="date-main">How are you <em>really</em> today?</div>
+    </div>
+
+    <!-- Already checked in today? Show success + TGT prompt -->
+    <div id="checkin-done" style="display:none">
+      <div class="success-card">
+        <div class="success-icon">☀️</div>
+        <div class="success-title">Morning check-in complete</div>
+        <div class="success-sub">You checked in at 8:42 AM · Great start to the day</div>
+      </div>
+
+      <div class="notif-banner" onclick="showTGT()">
+        <div class="notif-icon">🌙</div>
+        <div class="notif-text">
+          <div class="notif-title">Tonight: Three Good Things</div>
+          <div class="notif-sub">A 2-min reflection before bed</div>
+        </div>
+        <div class="notif-arrow">›</div>
+      </div>
+    </div>
+
+    <!-- Check-in form -->
+    <div id="checkin-form">
+      <!-- Sliders -->
+      <div class="card">
+        <div class="card-label"><span class="dot"></span>Mental State</div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Stress level</span>
+            <span class="slider-val" id="val-stress">5</span>
+          </div>
+          <input type="range" min="1" max="10" value="5" oninput="updateSlider('stress', this.value)">
+          <div class="slider-hints"><span>Calm</span><span>Overwhelmed</span></div>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Energy</span>
+            <span class="slider-val" id="val-energy">5</span>
+          </div>
+          <input type="range" min="1" max="10" value="5" oninput="updateSlider('energy', this.value)">
+          <div class="slider-hints"><span>Depleted</span><span>Energised</span></div>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Mood</span>
+            <span class="slider-val" id="val-mood">5</span>
+          </div>
+          <input type="range" min="1" max="10" value="5" oninput="updateSlider('mood', this.value)">
+          <div class="slider-hints"><span>Low</span><span>Great</span></div>
+        </div>
+      </div>
+
+      <!-- Emotion labels -->
+      <div class="card">
+        <div class="card-label"><span class="dot"></span>What's present for you right now?</div>
+        <div class="emotion-grid" id="emotion-grid">
+          <button class="emotion-chip" onclick="toggleEmotion(this)">😟 Anxious</button>
+          <button class="emotion-chip" onclick="toggleEmotion(this)">😤 Frustrated</button>
+          <button class="emotion-chip" onclick="toggleEmotion(this)">😔 Tired</button>
+          <button class="emotion-chip" onclick="toggleEmotion(this)">😐 Neutral</button>
+          <button class="emotion-chip" onclick="toggleEmotion(this)">🙂 Okay</button>
+          <button class="emotion-chip" onclick="toggleEmotion(this)">😊 Positive</button>
+          <button class="emotion-chip" onclick="toggleEmotion(this)">🔥 Motivated</button>
+          <button class="emotion-chip" onclick="toggleEmotion(this)">😌 Calm</button>
+          <button class="emotion-chip" onclick="toggleEmotion(this)">🤝 Connected</button>
+          <button class="emotion-chip" onclick="toggleEmotion(this)">😶 Disconnected</button>
+        </div>
+      </div>
+
+      <!-- Optional note -->
+      <div class="card">
+        <div class="card-label"><span class="dot"></span>Anything on your mind? <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#b8b0a8;font-size:11px;">(optional)</span></div>
+        <textarea class="note-area" placeholder="A thought, a worry, something you're looking forward to..."></textarea>
+      </div>
+
+      <button class="btn-primary" onclick="submitCheckin()">Complete Morning Check-in ✓</button>
+    </div>
+
+    <!-- Three Good Things (hidden) -->
+    <div id="tgt-section" style="display:none">
+      <div class="date-header">
+        <div class="date-greeting">Tonight's reflection —</div>
+        <div class="date-main">Three <em>Good Things</em></div>
+      </div>
+
+      <div class="tgt-card">
+        <div class="tgt-header">
+          <div class="tgt-title">What went well today?</div>
+          <div class="tgt-sub">For each good thing, write <strong style="color:var(--night)">what</strong> happened — then reflect on <strong style="color:var(--good)">why</strong> it happened. The "why" is where the insight lives.</div>
+        </div>
+
+        <!-- Entry 1 -->
+        <div class="tgt-entry">
+          <div class="tgt-entry-header">
+            <div class="tgt-num">1</div>
+            <span class="tgt-entry-label">First good thing</span>
+          </div>
+          <div class="tgt-field-group">
+            <div class="tgt-field-label what-label">✦ What happened</div>
+            <input class="tgt-input" type="text" placeholder="Something good that happened today...">
+            <div class="tgt-field-label why-label">↳ Why did it happen?</div>
+            <input class="tgt-input tgt-why" type="text" placeholder="Because I... / Because someone... / It happened when...">
+          </div>
+        </div>
+
+        <!-- Entry 2 -->
+        <div class="tgt-entry">
+          <div class="tgt-entry-header">
+            <div class="tgt-num">2</div>
+            <span class="tgt-entry-label">Second good thing</span>
+          </div>
+          <div class="tgt-field-group">
+            <div class="tgt-field-label what-label">✦ What happened</div>
+            <input class="tgt-input" type="text" placeholder="Another good thing...">
+            <div class="tgt-field-label why-label">↳ Why did it happen?</div>
+            <input class="tgt-input tgt-why" type="text" placeholder="Because I... / Because someone... / It happened when...">
+          </div>
+        </div>
+
+        <!-- Entry 3 -->
+        <div class="tgt-entry">
+          <div class="tgt-entry-header">
+            <div class="tgt-num">3</div>
+            <span class="tgt-entry-label">Third good thing</span>
+          </div>
+          <div class="tgt-field-group">
+            <div class="tgt-field-label what-label">✦ What happened</div>
+            <input class="tgt-input" type="text" placeholder="One more good thing...">
+            <div class="tgt-field-label why-label">↳ Why did it happen?</div>
+            <input class="tgt-input tgt-why" type="text" placeholder="Because I... / Because someone... / It happened when...">
+          </div>
+        </div>
+
+        <button class="btn-night" onclick="submitTGT()">Save Tonight's Reflection 🌙</button>
+      </div>
+
+      <button class="btn-secondary" onclick="showCheckinDone()">← Back</button>
+    </div>
+
+  </div>
+
+  <!-- TRENDS SCREEN -->
+  <div id="screen-trends" class="screen">
+
+    <div class="trend-header">
+      <div class="trend-title">Your <em style="font-family:'Playfair Display',serif;color:var(--morning)">pattern</em></div>
+      <div class="trend-sub">Last 7 days · Updated daily</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="stat-val">6.4</span>
+        <span class="stat-label">Avg Mood</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-val" style="color:var(--night)">5</span>
+        <span class="stat-label">Check-ins</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-val" style="color:var(--good)">3</span>
+        <span class="stat-label">TGT Days</span>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-card">
+      <div class="chart-title">
+        <span>Mood & Energy</span>
+        <div class="chart-legend">
+          <span><span class="legend-dot" style="background:var(--morning)"></span>Mood</span>
+          <span><span class="legend-dot" style="background:var(--night)"></span>Energy</span>
+          <span><span class="legend-dot" style="background:var(--good)"></span>TGT</span>
+        </div>
+      </div>
+      <canvas id="trendChart"></canvas>
+    </div>
+
+    <!-- Stress chart -->
+    <div class="chart-card">
+      <div class="chart-title">Stress Level</div>
+      <canvas id="stressChart"></canvas>
+    </div>
+
+    <!-- Recent emotions -->
+    <div class="card">
+      <div class="card-label"><span class="dot"></span>Recent Check-ins</div>
+      <div class="emotion-history">
+        <div class="history-row">
+          <span class="history-date">Today, Mon</span>
+          <div class="history-emotions">
+            <span class="history-chip">🔥 Motivated</span>
+            <span class="history-chip">😊 Positive</span>
+          </div>
+          <span class="tgt-badge">✦ TGT</span>
+        </div>
+        <div class="history-row">
+          <span class="history-date">Sun</span>
+          <div class="history-emotions">
+            <span class="history-chip">😌 Calm</span>
+          </div>
+          <span class="tgt-badge">✦ TGT</span>
+        </div>
+        <div class="history-row">
+          <span class="history-date">Sat</span>
+          <div class="history-emotions">
+            <span class="history-chip">😐 Neutral</span>
+            <span class="history-chip">😔 Tired</span>
+          </div>
+          <span style="font-size:11px;color:var(--muted)">—</span>
+        </div>
+        <div class="history-row">
+          <span class="history-date">Fri</span>
+          <div class="history-emotions">
+            <span class="history-chip">😤 Frustrated</span>
+          </div>
+          <span style="font-size:11px;color:var(--muted)">—</span>
+        </div>
+        <div class="history-row">
+          <span class="history-date">Thu</span>
+          <div class="history-emotions">
+            <span class="history-chip">🔥 Motivated</span>
+          </div>
+          <span class="tgt-badge">✦ TGT</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Insight card -->
+    <div class="card" style="background:linear-gradient(135deg,#fdf0e8,#fff8f4);border-color:#f0d0b8;">
+      <div class="card-label"><span class="dot"></span>This week's insight</div>
+      <div style="font-size:14px;color:var(--ink);line-height:1.65;">
+        On days you completed <strong>Three Good Things</strong>, your next-morning mood score averaged <strong style="color:var(--morning)">7.8</strong> — compared to <strong>5.2</strong> on days you didn't. 🌱
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <button class="bnav-item active" id="bnav-checkin" onclick="showScreen('checkin', null, 'checkin')">
+      <span class="bnav-icon">☀️</span>
+      <span class="bnav-label">Check-in</span>
+    </button>
+    <button class="bnav-item" id="bnav-trends" onclick="showScreen('trends', null, 'trends')">
+      <span class="bnav-icon">📈</span>
+      <span class="bnav-label">Trends</span>
+    </button>
+  </div>
+
+</div>
+
+<script>
+  // Screen switching
+  function showScreen(name, tabBtn, bnavId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + name).classList.add('active');
+
+    if (tabBtn) {
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      tabBtn.classList.add('active');
+    }
+
+    if (bnavId) {
+      document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
+      document.getElementById('bnav-' + bnavId).classList.add('active');
+    }
+
+    // Sync nav tabs
+    const tabMap = { checkin: 0, trends: 1 };
+    const tabs = document.querySelectorAll('.nav-tab');
+    if (tabMap[name] !== undefined) {
+      tabs.forEach(t => t.classList.remove('active'));
+      tabs[tabMap[name]].classList.add('active');
+    }
+  }
+
+  // Slider update
+  function updateSlider(key, val) {
+    const el = document.getElementById('val-' + key);
+    el.textContent = val;
+    const n = parseInt(val);
+    el.className = 'slider-val ' + (n <= 3 ? 'low' : n <= 6 ? 'mid' : 'high');
+
+    // Update slider fill colour
+    const pct = (n - 1) / 9 * 100;
+    const color = n <= 3 ? '#c0392b' : n <= 6 ? '#d97706' : '#4a7c59';
+    event.target.style.background = `linear-gradient(to right, ${color} ${pct}%, #e7e2da ${pct}%)`;
+  }
+
+  // Emotion toggle
+  function toggleEmotion(btn) {
+    btn.classList.toggle('selected');
+  }
+
+  // Submit check-in
+  function submitCheckin() {
+    document.getElementById('checkin-form').style.display = 'none';
+    document.getElementById('checkin-done').style.display = 'block';
+  }
+
+  // Show TGT
+  function showTGT() {
+    document.getElementById('checkin-done').style.display = 'none';
+    document.getElementById('tgt-section').style.display = 'block';
+  }
+
+  function showCheckinDone() {
+    document.getElementById('tgt-section').style.display = 'none';
+    document.getElementById('checkin-done').style.display = 'block';
+  }
+
+  function submitTGT() {
+    document.getElementById('tgt-section').style.display = 'none';
+    document.getElementById('checkin-done').style.display = 'block';
+    // Show success flash
+    const banner = document.querySelector('.notif-banner');
+    banner.innerHTML = '<div class="notif-icon">✦</div><div class="notif-text"><div class="notif-title" style="color:#fff">Three Good Things saved</div><div class="notif-sub">Great work. Sleep well 🌙</div></div>';
+    banner.style.background = 'linear-gradient(135deg, #4a7c59, #3a6449)';
+  }
+
+  // Charts
+  window.addEventListener('load', () => {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const mood =   [null, 5, 6, 7, 4, 5, 7];
+    const energy = [null, 6, 5, 8, 4, 5, 6];
+    const stress = [null, 4, 5, 3, 7, 6, 4];
+    const tgtDays = [false, false, false, true, false, false, true];
+
+    // Color palette
+    const orange = '#e8824a';
+    const navy = '#3d5a80';
+    const green = '#4a7c59';
+
+    function drawLineChart(canvasId, datasets, labels, tgt) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const W = canvas.offsetWidth || 340;
+      const H = 160;
+      canvas.width = W;
+      canvas.height = H;
+
+      const pad = { top: 16, right: 16, bottom: 28, left: 28 };
+      const gW = W - pad.left - pad.right;
+      const gH = H - pad.top - pad.bottom;
+      const pts = labels.length;
+
+      ctx.clearRect(0, 0, W, H);
+
+      // TGT markers (background)
+      if (tgt) {
+        tgt.forEach((t, i) => {
+          if (t && i > 0) {
+            const x = pad.left + (i / (pts - 1)) * gW;
+            ctx.fillStyle = 'rgba(74,124,89,0.08)';
+            ctx.fillRect(x - 14, pad.top, 28, gH);
+          }
+        });
+      }
+
+      // Grid lines
+      ctx.strokeStyle = '#e7e2da';
+      ctx.lineWidth = 1;
+      [2, 4, 6, 8, 10].forEach(v => {
+        const y = pad.top + gH - ((v - 1) / 9) * gH;
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(pad.left + gW, y);
+        ctx.stroke();
+      });
+
+      // Draw each dataset
+      datasets.forEach(({ data, color }) => {
+        const validPts = data.map((v, i) => v !== null ? { x: pad.left + (i / (pts - 1)) * gW, y: pad.top + gH - ((v - 1) / 9) * gH } : null);
+
+        // Line
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        let first = true;
+        validPts.forEach(pt => {
+          if (!pt) return;
+          if (first) { ctx.moveTo(pt.x, pt.y); first = false; }
+          else ctx.lineTo(pt.x, pt.y);
+        });
+        ctx.stroke();
+
+        // Dots
+        validPts.forEach(pt => {
+          if (!pt) return;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+          ctx.fillStyle = '#fff';
+          ctx.fill();
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        });
+      });
+
+      // X labels
+      ctx.fillStyle = '#78716c';
+      ctx.font = '10px Outfit, sans-serif';
+      ctx.textAlign = 'center';
+      labels.forEach((l, i) => {
+        const x = pad.left + (i / (pts - 1)) * gW;
+        ctx.fillText(l, x, H - 6);
+        if (tgt && tgt[i]) {
+          ctx.fillStyle = green;
+          ctx.fillText('✦', x, H - 6);
+          ctx.fillStyle = '#78716c';
+        }
+      });
+    }
+
+    drawLineChart('trendChart', [
+      { data: mood, color: orange },
+      { data: energy, color: navy }
+    ], days, tgtDays);
+
+    drawLineChart('stressChart', [
+      { data: stress, color: '#c0392b' }
+    ], days, null);
+  });
+</script>
+</body>
+</html>
