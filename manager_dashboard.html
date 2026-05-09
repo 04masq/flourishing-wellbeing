@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flourish — Manager View</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;1,400&display=swap');
+
+  :root {
+    --bg: #f0f4f8;
+    --surface: #ffffff;
+    --ink: #1c1917;
+    --muted: #78716c;
+    --border: #dde3ea;
+    --primary: #2d4a6e;
+    --primary-light: #e8eef5;
+    --primary-dark: #1e3350;
+    --accent: #e8824a;
+    --accent-light: #fdf0e8;
+    --good: #4a7c59;
+    --good-light: #eaf2ec;
+    --warn: #d97706;
+    --warn-light: #fef3c7;
+    --risk: #c0392b;
+    --risk-light: #fdecea;
+    --radius: 20px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.07);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Nav */
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px 14px;
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .nav-left { display: flex; flex-direction: column; gap: 2px; }
+
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+
+  .nav-logo span { color: var(--accent); font-style: italic; }
+
+  .nav-role {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--primary);
+    font-weight: 600;
+    background: var(--primary-light);
+    padding: 2px 8px;
+    border-radius: 20px;
+    display: inline-block;
+    width: fit-content;
+  }
+
+  .nav-right {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+    line-height: 1.5;
+  }
+
+  .nav-right strong { color: var(--ink); display: block; font-size: 13px; }
+
+  /* Main content */
+  .content { padding: 8px 24px 100px; }
+
+  /* Week header */
+  .week-header {
+    margin-bottom: 20px;
+  }
+
+  .week-greeting {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 2px;
+  }
+
+  .week-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .week-title em { color: var(--primary); font-style: italic; }
+
+  /* Privacy notice */
+  .privacy-notice {
+    background: var(--primary-light);
+    border: 1px solid #c5d5e8;
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .privacy-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .privacy-text { font-size: 11.5px; color: #4a6a8a; line-height: 1.5; }
+  .privacy-text strong { color: var(--primary); }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .label-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+  }
+
+  /* Participation bar */
+  .participation-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .participation-label { font-size: 13px; color: var(--ink); font-weight: 500; }
+  .participation-count { font-size: 22px; font-weight: 700; color: var(--primary); }
+  .participation-sub { font-size: 11px; color: var(--muted); }
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    background: var(--primary);
+    transition: width 1s ease;
+  }
+
+  .progress-hint {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  /* Metric grid */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .metric-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 16px 12px;
+    text-align: center;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .metric-card.good::before { background: var(--good); }
+  .metric-card.warn::before { background: var(--warn); }
+  .metric-card.risk::before { background: var(--risk); }
+
+  .metric-val {
+    font-size: 28px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 2px;
+    line-height: 1;
+  }
+
+  .metric-card.good .metric-val { color: var(--good); }
+  .metric-card.warn .metric-val { color: var(--warn); }
+  .metric-card.risk .metric-val { color: var(--risk); }
+
+  .metric-name {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .metric-delta {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+    display: inline-block;
+  }
+
+  .delta-up { background: var(--good-light); color: var(--good); }
+  .delta-down { background: var(--risk-light); color: var(--risk); }
+  .delta-flat { background: #f5f2eb; color: var(--muted); }
+
+  /* Signal banner */
+  .signal-banner {
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .signal-banner.warn {
+    background: var(--warn-light);
+    border: 1px solid #fcd34d;
+  }
+
+  .signal-banner.risk {
+    background: var(--risk-light);
+    border: 1px solid #f5a89e;
+  }
+
+  .signal-banner.good {
+    background: var(--good-light);
+    border: 1px solid #c3dfc9;
+  }
+
+  .signal-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+
+  .signal-text { flex: 1; }
+
+  .signal-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+
+  .signal-banner.warn .signal-title { color: #92400e; }
+  .signal-banner.risk .signal-title { color: var(--risk); }
+  .signal-banner.good .signal-title { color: var(--good); }
+
+  .signal-sub {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .signal-banner.warn .signal-sub { color: #a05a1a; }
+  .signal-banner.risk .signal-sub { color: #8a2a20; }
+  .signal-banner.good .signal-sub { color: #3a6449; }
+
+  .signal-action {
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 6px;
+    text-decoration: underline;
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  /* Chart */
+  .chart-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .chart-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .chart-legend {
+    display: flex;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .legend-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 3px;
+  }
+
+  canvas { width: 100% !important; height: 160px !important; }
+
+  /* Emotion distribution */
+  .emotion-bar-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .emotion-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .emotion-bar-label {
+    font-size: 12px;
+    color: var(--ink);
+    width: 90px;
+    flex-shrink: 0;
+  }
+
+  .emotion-bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .emotion-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 1s ease;
+  }
+
+  .emotion-bar-pct {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    width: 32px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* Resources section */
+  .resource-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--bg);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .resource-item:hover { border-color: var(--primary); background: var(--primary-light); }
+  .resource-item:last-child { margin-bottom: 0; }
+
+  .resource-icon { font-size: 20px; flex-shrink: 0; }
+
+  .resource-text { flex: 1; }
+  .resource-title { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .resource-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  .resource-arrow { color: var(--muted); font-size: 14px; }
+
+  /* EAP Guidance */
+  .eap-context {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    background: var(--warn-light);
+    border-radius: 10px;
+    border-left: 3px solid var(--warn);
+  }
+
+  .eap-step {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+
+  .eap-step:last-of-type { margin-bottom: 0; }
+
+  .eap-step-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .eap-step-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .eap-step-desc {
+    font-size: 12.5px;
+    color: #5a5450;
+    line-height: 1.6;
+  }
+
+  /* Leadership Enhancement */
+  .leadership-tip {
+    background: var(--primary-light);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid #c5d5e8;
+  }
+
+  .tip-header { margin-bottom: 8px; }
+
+  .tip-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--primary);
+    letter-spacing: 0.04em;
+  }
+
+  .tip-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    color: var(--primary);
+    margin-bottom: 8px;
+  }
+
+  .tip-body {
+    font-size: 13px;
+    color: #3a5070;
+    line-height: 1.65;
+    margin-bottom: 8px;
+  }
+
+  .tip-source {
+    font-size: 11px;
+    color: #6a8aaa;
+    font-style: italic;
+  }
+
+  .leadership-actions {
+    margin-bottom: 4px;
+  }
+
+  .la-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .la-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  .la-item:last-child { border-bottom: none; }
+
+  .la-check {
+    font-size: 16px;
+    color: var(--primary);
+    flex-shrink: 0;
+    transition: all 0.2s;
+    line-height: 1.4;
+  }
+
+  .la-item.done .la-check { color: var(--good); }
+  .la-item.done .la-text { text-decoration: line-through; color: var(--muted); }
+
+  .la-text {
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 20px;
+    z-index: 20;
+  }
+
+  .bnav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    padding: 4px 20px;
+    border-radius: 12px;
+    transition: all 0.2s;
+    border: none;
+    background: transparent;
+  }
+
+  .bnav-icon { font-size: 20px; }
+  .bnav-label { font-size: 10px; font-weight: 500; color: var(--muted); }
+  .bnav-item.active .bnav-label { color: var(--primary); }
+
+  /* Screens */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .content > * {
+    animation: fadeUp 0.3s ease both;
+  }
+
+  .content > *:nth-child(2) { animation-delay: 0.05s; }
+  .content > *:nth-child(3) { animation-delay: 0.1s; }
+  .content > *:nth-child(4) { animation-delay: 0.15s; }
+  .content > *:nth-child(5) { animation-delay: 0.2s; }
+  .content > *:nth-child(6) { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Nav -->
+  <div class="nav">
+    <div class="nav-left">
+      <div class="nav-logo">flour<span>ish</span></div>
+      <div class="nav-role">Manager View</div>
+    </div>
+    <div class="nav-right">
+      <strong>Sarah Chen</strong>
+      Team of 12
+    </div>
+  </div>
+
+  <!-- OVERVIEW SCREEN -->
+  <div class="content">
+
+    <div class="week-header">
+      <div class="week-greeting">Week of 5 May —</div>
+      <div class="week-title">Your team's <em>wellbeing</em></div>
+    </div>
+
+    <!-- Privacy notice -->
+    <div class="privacy-notice">
+      <div class="privacy-icon">🔒</div>
+      <div class="privacy-text">
+        <strong>Anonymous & aggregate only.</strong> Individual responses, names, and submission times are never shown. You see your team as a whole.
+      </div>
+    </div>
+
+    <!-- Participation -->
+    <div class="card">
+      <div class="card-label">
+        <div class="label-dot" style="background:var(--primary)"></div>
+        This week's participation
+      </div>
+      <div class="participation-row">
+        <div>
+          <div class="participation-label">Check-ins completed</div>
+          <div class="participation-sub">out of 12 team members</div>
+        </div>
+        <div class="participation-count">9</div>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 75%"></div>
+      </div>
+      <div class="progress-hint">75% this week · ↑ up from 58% last week</div>
+    </div>
+
+    <!-- Key metrics -->
+    <div class="metric-grid">
+      <div class="metric-card good">
+        <span class="metric-val">6.8</span>
+        <span class="metric-name">Avg Mood</span>
+        <span class="metric-delta delta-up">↑ +0.6</span>
+      </div>
+      <div class="metric-card warn">
+        <span class="metric-val">5.9</span>
+        <span class="metric-name">Avg Energy</span>
+        <span class="metric-delta delta-flat">→ flat</span>
+      </div>
+      <div class="metric-card warn">
+        <span class="metric-val">6.2</span>
+        <span class="metric-name">Avg Stress</span>
+        <span class="metric-delta delta-down">↑ +1.1</span>
+      </div>
+    </div>
+
+    <!-- Signals -->
+    <div class="card">
+      <div class="card-label">
+        <div class="label-dot" style="background:var(--warn)"></div>
+        Team signals this week
+      </div>
+
+      <div class="signal-banner risk">
+        <div class="signal-icon">⚠️</div>
+        <div class="signal-text">
+          <div class="signal-title">Stress elevated for 3+ days</div>
+          <div class="signal-sub">A portion of your team has reported high stress consistently this week. Consider checking in with the team as a group.</div>
+          <div class="signal-action" style="color:var(--risk)">View suggested actions →</div>
+        </div>
+      </div>
+
+      <div class="signal-banner warn">
+        <div class="signal-icon">🔋</div>
+        <div class="signal-text">
+          <div class="signal-title">Energy dip mid-week</div>
+          <div class="signal-sub">Team energy tends to drop Wednesday–Thursday. This pattern has repeated for 3 weeks.</div>
+          <div class="signal-action" style="color:var(--warn)">See the trend →</div>
+        </div>
+      </div>
+
+      <div class="signal-banner good">
+        <div class="signal-icon">🌱</div>
+        <div class="signal-text">
+          <div class="signal-title">Three Good Things up 40%</div>
+          <div class="signal-sub">More team members completed their evening reflection this week. Mood scores on those days averaged higher.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trend chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">Team mood & stress — 7 days</div>
+        <div class="chart-legend">
+          <span><span class="legend-dot" style="background:var(--good)"></span>Mood</span>
+          <span><span class="legend-dot" style="background:var(--risk)"></span>Stress</span>
+        </div>
+      </div>
+      <canvas id="teamChart"></canvas>
+    </div>
+
+    <!-- Emotion distribution -->
+    <div class="card">
+      <div class="card-label">
+        <div class="label-dot" style="background:var(--accent)"></div>
+        Most common emotions this week
+      </div>
+      <div class="emotion-bar-group">
+        <div class="emotion-bar-row">
+          <div class="emotion-bar-label">😔 Tired</div>
+          <div class="emotion-bar-track"><div class="emotion-bar-fill" style="width:68%;background:#d97706"></div></div>
+          <div class="emotion-bar-pct">68%</div>
+        </div>
+        <div class="emotion-bar-row">
+          <div class="emotion-bar-label">🔥 Motivated</div>
+          <div class="emotion-bar-track"><div class="emotion-bar-fill" style="width:54%;background:var(--good)"></div></div>
+          <div class="emotion-bar-pct">54%</div>
+        </div>
+        <div class="emotion-bar-row">
+          <div class="emotion-bar-label">😟 Anxious</div>
+          <div class="emotion-bar-track"><div class="emotion-bar-fill" style="width:42%;background:var(--risk)"></div></div>
+          <div class="emotion-bar-pct">42%</div>
+        </div>
+        <div class="emotion-bar-row">
+          <div class="emotion-bar-label">😊 Positive</div>
+          <div class="emotion-bar-track"><div class="emotion-bar-fill" style="width:38%;background:var(--primary)"></div></div>
+          <div class="emotion-bar-pct">38%</div>
+        </div>
+        <div class="emotion-bar-row">
+          <div class="emotion-bar-label">😌 Calm</div>
+          <div class="emotion-bar-track"><div class="emotion-bar-fill" style="width:22%;background:#7ab8d4)"></div></div>
+          <div class="emotion-bar-pct">22%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EAP Guidance card -->
+    <div class="card">
+      <div class="card-label">
+        <div class="label-dot" style="background:var(--warn)"></div>
+        EAP Guidance — based on this week's data
+      </div>
+
+      <div class="eap-context">
+        Your team's stress signal is elevated. Here's what you can do as a manager.
+      </div>
+
+      <div class="eap-step">
+        <div class="eap-step-num">1</div>
+        <div class="eap-step-body">
+          <div class="eap-step-title">Start with a group check-in</div>
+          <div class="eap-step-desc">Open your next team meeting with "How is everyone feeling this week?" — no pressure to share, just normalise the conversation. Avoid singling anyone out.</div>
+        </div>
+      </div>
+
+      <div class="eap-step">
+        <div class="eap-step-num">2</div>
+        <div class="eap-step-body">
+          <div class="eap-step-title">Make EAP visible, not personal</div>
+          <div class="eap-step-desc">Mention EAP as a team resource — not directed at anyone. Try: "Just a reminder that our EAP is free, confidential, and available to everyone."</div>
+        </div>
+      </div>
+
+      <div class="eap-step">
+        <div class="eap-step-num">3</div>
+        <div class="eap-step-body">
+          <div class="eap-step-title">If someone seems to be struggling</div>
+          <div class="eap-step-desc">Ask privately: "I've noticed you seem a bit off lately — is there anything I can support you with?" Then listen. You don't need to fix it.</div>
+        </div>
+      </div>
+
+      <div class="resource-item" style="margin-top:12px">
+        <div class="resource-icon">📋</div>
+        <div class="resource-text">
+          <div class="resource-title">EAP referral script for managers</div>
+          <div class="resource-sub">Word-for-word guidance · 2-min read</div>
+        </div>
+        <div class="resource-arrow">›</div>
+      </div>
+
+      <div class="resource-item">
+        <div class="resource-icon">📞</div>
+        <div class="resource-text">
+          <div class="resource-title">Contact EAP provider directly</div>
+          <div class="resource-sub">For manager consultations · Free & confidential</div>
+        </div>
+        <div class="resource-arrow">›</div>
+      </div>
+    </div>
+
+    <!-- Leadership Enhancement card -->
+    <div class="card" style="border-color:#c5d5e8;">
+      <div class="card-label">
+        <div class="label-dot" style="background:var(--primary)"></div>
+        Leadership this week
+      </div>
+
+      <div class="leadership-tip">
+        <div class="tip-header">
+          <span class="tip-badge">💡 This week's focus</span>
+        </div>
+        <div class="tip-title">Psychological Safety</div>
+        <div class="tip-body">When stress is high, employees need to feel safe to speak up. One simple move: next time someone raises a problem, respond with curiosity before solutions. Try "Tell me more about that" before jumping to fix mode.</div>
+        <div class="tip-source">Based on Amy Edmondson's research on team psychological safety</div>
+      </div>
+
+      <div class="leadership-actions">
+        <div class="la-title">3 things to try this week</div>
+        <div class="la-item">
+          <span class="la-check">○</span>
+          <span class="la-text">Acknowledge the team's effort publicly in your next standup</span>
+        </div>
+        <div class="la-item">
+          <span class="la-check">○</span>
+          <span class="la-text">Block 15 min for a 1:1 with someone who seems quiet lately</span>
+        </div>
+        <div class="la-item">
+          <span class="la-check">○</span>
+          <span class="la-text">Share one thing you personally found challenging this week — model vulnerability</span>
+        </div>
+      </div>
+
+      <div class="resource-item" style="margin-top:12px">
+        <div class="resource-icon">🎓</div>
+        <div class="resource-text">
+          <div class="resource-title">Wellbeing-aware leadership library</div>
+          <div class="resource-sub">Articles, frameworks & tools for managers</div>
+        </div>
+        <div class="resource-arrow">›</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <button class="bnav-item active" onclick="setNav(this)">
+      <span class="bnav-icon">📊</span>
+      <span class="bnav-label">Overview</span>
+    </button>
+    <button class="bnav-item" onclick="setNav(this)">
+      <span class="bnav-icon">📈</span>
+      <span class="bnav-label">Trends</span>
+    </button>
+    <button class="bnav-item" onclick="setNav(this)">
+      <span class="bnav-icon">🩺</span>
+      <span class="bnav-label">EAP Guide</span>
+    </button>
+    <button class="bnav-item" onclick="setNav(this)">
+      <span class="bnav-icon">🎓</span>
+      <span class="bnav-label">Leadership</span>
+    </button>
+  </div>
+
+</div>
+
+<script>
+  // Nav
+  function setNav(btn) {
+    document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // Leadership checklist toggle
+  document.querySelectorAll('.la-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const isDone = item.classList.toggle('done');
+      item.querySelector('.la-check').textContent = isDone ? '✓' : '○';
+    });
+  });
+
+  window.addEventListener('load', () => {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const mood =   [6.2, 6.8, 6.5, 6.0, 7.1, 7.2, 6.8];
+    const stress = [5.5, 6.0, 6.8, 7.2, 6.0, 5.2, 6.2];
+
+    const canvas = document.getElementById('teamChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.offsetWidth || 400;
+    const H = 150;
+    canvas.width = W;
+    canvas.height = H;
+
+    const pad = { top: 16, right: 16, bottom: 28, left: 32 };
+    const gW = W - pad.left - pad.right;
+    const gH = H - pad.top - pad.bottom;
+    const pts = days.length;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Grid
+    ctx.strokeStyle = '#dde3ea';
+    ctx.lineWidth = 1;
+    [4, 6, 8, 10].forEach(v => {
+      const y = pad.top + gH - ((v - 1) / 9) * gH;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(pad.left + gW, y);
+      ctx.stroke();
+      ctx.fillStyle = '#78716c';
+      ctx.font = '9px Outfit';
+      ctx.textAlign = 'right';
+      ctx.fillText(v, pad.left - 4, y + 3);
+    });
+
+    function drawLine(data, color) {
+      const points = data.map((v, i) => ({
+        x: pad.left + (i / (pts - 1)) * gW,
+        y: pad.top + gH - ((v - 1) / 9) * gH
+      }));
+
+      // Area fill
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, pad.top + gH);
+      points.forEach(p => ctx.lineTo(p.x, p.y));
+      ctx.lineTo(points[pts-1].x, pad.top + gH);
+      ctx.closePath();
+      ctx.fillStyle = color + '18';
+      ctx.fill();
+
+      // Line
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.5;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+      ctx.stroke();
+
+      // Dots
+      points.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      });
+    }
+
+    drawLine(mood, '#4a7c59');
+    drawLine(stress, '#c0392b');
+
+    // X labels
+    ctx.fillStyle = '#78716c';
+    ctx.font = '10px Outfit';
+    ctx.textAlign = 'center';
+    days.forEach((d, i) => {
+      const x = pad.left + (i / (pts - 1)) * gW;
+      ctx.fillText(d, x, H - 6);
+    });
+  });
+</script>
+</body>
+</html>

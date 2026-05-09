@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flourish — Workplace Wellbeing</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,400;1,500&display=swap');
+
+  :root {
+    --bg: #f7f4ef;
+    --ink: #1c1917;
+    --muted: #78716c;
+    --border: #e7e2da;
+    --morning: #e8824a;
+    --morning-light: #fdf0e8;
+    --morning-dark: #c4632e;
+    --night: #2d4a6e;
+    --night-light: #e8eef5;
+    --good: #4a7c59;
+    --good-light: #eaf2ec;
+    --shadow: 0 8px 40px rgba(0,0,0,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+
+  .logo span { color: var(--morning); font-style: italic; }
+
+  .tagline {
+    font-size: 15px;
+    color: var(--muted);
+    font-weight: 300;
+    line-height: 1.6;
+    max-width: 320px;
+    margin: 0 auto 24px;
+  }
+
+  .tagline em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  .divider {
+    width: 40px;
+    height: 2px;
+    background: var(--morning);
+    margin: 0 auto;
+    border-radius: 2px;
+  }
+
+  /* Role cards */
+  .role-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 16px;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+
+  .cards {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+
+  .role-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px;
+    border: 1.5px solid var(--border);
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .role-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    transition: height 0.25s;
+  }
+
+  .role-card.employee::before { background: linear-gradient(90deg, var(--morning), #f5a87a); }
+  .role-card.manager::before { background: linear-gradient(90deg, var(--night), #4a7aaa); }
+
+  .role-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.12);
+  }
+
+  .role-card.employee:hover { border-color: var(--morning); }
+  .role-card.manager:hover { border-color: var(--night); }
+
+  .role-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+
+  .role-card.employee .role-icon { background: var(--morning-light); }
+  .role-card.manager .role-icon { background: var(--night-light); }
+
+  .role-content { flex: 1; }
+
+  .role-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  .role-desc {
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .role-arrow {
+    font-size: 20px;
+    color: var(--border);
+    flex-shrink: 0;
+    transition: all 0.25s;
+  }
+
+  .role-card.employee:hover .role-arrow { color: var(--morning); transform: translateX(4px); }
+  .role-card.manager:hover .role-arrow { color: var(--night); transform: translateX(4px); }
+
+  /* Feature pills */
+  .features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .feature-pill {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .role-card.employee .feature-pill {
+    background: var(--morning-light);
+    color: var(--morning-dark);
+  }
+
+  .role-card.manager .feature-pill {
+    background: var(--night-light);
+    color: var(--night);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+
+  .footer-text {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .footer-text strong { color: var(--ink); font-weight: 500; }
+
+  .built-by {
+    margin-top: 20px;
+    font-size: 11px;
+    color: #b8b0a8;
+    letter-spacing: 0.05em;
+  }
+
+  .built-by a {
+    color: var(--morning);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .cards .role-card:nth-child(1) { animation: fadeUp 0.6s ease 0.15s both; }
+  .cards .role-card:nth-child(2) { animation: fadeUp 0.6s ease 0.25s both; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">flour<span>ish</span></div>
+    <div class="tagline">
+      A workplace wellbeing tool built on <em>positive psychology</em> —
+      for employees who want to understand themselves, and managers who want to support their teams.
+    </div>
+    <div class="divider"></div>
+  </div>
+
+  <!-- Role selection -->
+  <div class="role-label">Who are you?</div>
+
+  <div class="cards">
+
+    <a class="role-card employee" href="wellbeing_app.html">
+      <div class="role-icon">☀️</div>
+      <div class="role-content">
+        <div class="role-title">I'm an Employee</div>
+        <div class="role-desc">Daily check-in, mood tracking, and Three Good Things evening reflection.</div>
+        <div class="features">
+          <span class="feature-pill">Daily check-in</span>
+          <span class="feature-pill">Trend insights</span>
+          <span class="feature-pill">Three Good Things</span>
+        </div>
+      </div>
+      <div class="role-arrow">›</div>
+    </a>
+
+    <a class="role-card manager" href="manager_dashboard.html">
+      <div class="role-icon">📊</div>
+      <div class="role-content">
+        <div class="role-title">I'm a Manager</div>
+        <div class="role-desc">Anonymous team wellbeing overview, EAP guidance, and leadership tools.</div>
+        <div class="features">
+          <span class="feature-pill">Team trends</span>
+          <span class="feature-pill">EAP guidance</span>
+          <span class="feature-pill">Leadership tips</span>
+        </div>
+      </div>
+      <div class="role-arrow">›</div>
+    </a>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-text">
+      All data is <strong>private and anonymous</strong>.<br>
+      Individual responses are never shared with managers or employers.
+    </div>
+    <div class="built-by">
+      Built by <a href="#">Masa Shinjo</a> · AUT Psychology · 2026
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
